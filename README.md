@@ -1,1 +1,34 @@
-Chức năngChọn độ khó & Tùy chỉnh kích thước: Cung cấp các mức độ cấu hình sẵn (Dễ: 10x10, Vừa: 15x15, Khó: 25x25, Cực khó: 40x40) hoặc cho phép người dùng tự nhập số hàng/số cột tùy ý từ bàn phím.Khởi tạo mê cung ngẫu nhiên (Maze Generation): Tự động xây dựng mê cung bằng thuật toán DFS Stack đảm bảo tính liên thông. Đồng thời áp dụng hàm braid (phá hủy tường ngẫu nhiên theo tỷ lệ phần trăm) để tạo ra các vòng lặp (loops) giúp mê cung có đa đường đi.Chế độ chơi thủ công (Manual Play): Người chơi điều khiển ký hiệu @ di chuyển bằng các phím độc lập W (Lên), A (Trái), S (Xuống), D (Phải). Giao diện sử dụng chế độ Raw Mode đọc phím lập tức, không cần nhấn phím Enter.Giải tự động bằng BFS (Đường đi ngắn nhất): Tự động tìm kiếm và in ra đường đi tối ưu nhất bằng các ký hiệu dấu chấm ., đồng thời thống kê chính xác độ dài đường đi tối ưu và số lượng ô đã phải khảo sát.Giải tự động bằng DFS trực quan (Visualized DFS): Tự động giải mê cung, đồng thời minh họa hoạt ảnh (animation) quá trình đi tới hoặc quay lui (backtrack) theo thời gian thực với độ trễ ngắn, in ra số lần thuật toán gặp ngõ cụt.So sánh BFS vs DFS: Chạy song song cả hai thuật toán trên cùng một cấu trúc mê cung, in kết quả đối sánh định lượng về: độ dài đường đi tìm được và số lượng tài nguyên đã duyệt qua để người học thấy rõ sự khác biệt bản chất giữa BFS và DFS.Test casesTest Case 1: Khởi tạo và thiết lập độ khó tùy chỉnh thành côngĐầu vào: Chọn Menu đổi độ khó $\rightarrow$ Nhập tùy chỉnh hàng = 12, cột = 15.Kết quả kỳ vọng: Màn hình xóa sạch và hiển thị lưới mê cung ASCII có kích thước chính xác $12 \times 15$. Ký hiệu xuất phát S nằm cố định tại ô $(1,1)$ và đích E nằm ở góc dưới cùng bên phải. Không có ô trống nào bị cô lập biệt lập hoàn toàn khỏi hệ thống đường đi.Test Case 2: Di chuyển thủ công mượt mà và nhận diện va chạm tườngĐầu vào: Chọn chế độ chơi thủ công $\rightarrow$ Nhấn phím D (đi sang phải) khi bên phải là khoảng trống, nhấn tiếp W (đi lên) khi phía trên là bức tường #.Kết quả kỳ vọng: Khi nhấn D, ký hiệu @ dịch chuyển ngay lập tức sang phải một bước, số bước đi tăng lên 1. Khi nhấn W đập vào tường, ký hiệu @ giữ nguyên vị trí cũ, số bước không đổi, không xảy ra hiện tượng vỡ giao diện hay treo chương trình.Test Case 3: BFS tìm đường đi ngắn nhất trên mê cung có vòng lặp (Braid)Đầu vào: Khởi tạo mê cung kèm tỷ lệ braid phá tường $\rightarrow$ Chọn chức năng giải bằng BFS.Kết quả kỳ vọng: Chương trình in ra đường đi dạng chuỗi ký tự .. Đường đi này chắc chắn là đường ngắn nhất có thể nối liền từ S đến E. Tổng số bước giải luôn bằng hoặc ít hơn đường đi của thuật toán DFS.Test Case 4: Hiển thị hoạt ảnh Backtracking của thuật toán DFSĐầu vào: Chọn chức năng giải bằng DFS (hành vi minh họa verbose).Kết quả kỳ vọng: Màn hình liên tục cập nhật dòng text thông báo trạng thái -> Di toi (r,c) và <- BACKTRACK tu (r,c) nhảy mượt mà nhờ hàm delay sleepMs(15). Khi gặp ngõ cụt, đường đi tự động co ngắn lại để rẽ nhánh khác cho đến khi chạm tới điểm E.Test Case 5: Đối sánh thuật toán kiểm chứng lý thuyết đồ thịĐầu vào: Chọn chức năng số 4 (So sánh BFS vs DFS).Kết quả kỳ vọng: In ra bảng số liệu thống kê rõ ràng. Trong trường hợp mê cung có vòng lặp (đa đường đi), kết quả chứng minh độ dài đường đi của BFS luôn nhỏ hơn hoặc bằng DFS ($Length_{BFS} \le Length_{DFS}$), trong khi số ô khảo sát của DFS thường ít hơn do nó dừng ngay khi tìm thấy nhánh đầu tiên chạm đích.
+GIỚI THIỆU TỔNG QUAN DỰ ÁN GAME MÊ CUNG
+1. Giới thiệu đề tài
+
+Dự án Maze Game (Game giải mê cung) là một chương trình được xây dựng bằng ngôn ngữ lập trình C++ với mục đích mô phỏng một trò chơi tìm đường trong mê cung.
+
+Trong trò chơi, hệ thống sẽ tự động tạo ra một mê cung ngẫu nhiên gồm nhiều ô vuông. Người chơi bắt đầu tại vị trí S (Start) và nhiệm vụ là tìm đường đến vị trí E (Exit) để thoát khỏi mê cung.
+
+Bên cạnh chế độ chơi thủ công, chương trình còn tích hợp các thuật toán tìm kiếm trên đồ thị như BFS (Breadth First Search) và DFS (Depth First Search) để máy tính có thể tự giải mê cung, đồng thời so sánh sự khác nhau giữa hai thuật toán.
+
+2. Mục tiêu của dự án
+
+Dự án được xây dựng nhằm các mục tiêu:
+
+Áp dụng kiến thức về cấu trúc dữ liệu và giải thuật vào một chương trình thực tế.
+Xây dựng hệ thống tạo mê cung tự động bằng thuật toán.
+Mô phỏng quá trình di chuyển và tìm đường trong game.
+Hiểu cách hoạt động của các thuật toán duyệt đồ thị.
+So sánh ưu điểm và nhược điểm của BFS và DFS.
+3. Ý tưởng hoạt động của game
+
+Mỗi mê cung được xem như một đồ thị (Graph):
+
+Mỗi ô trong mê cung là một đỉnh (Vertex).
+Các lối đi giữa các ô là cạnh (Edge).
+
+Chương trình gồm các bước chính:
+
+Người chơi chọn độ khó.
+Hệ thống tạo một mê cung ngẫu nhiên.
+Hiển thị mê cung trên màn hình dạng ký tự ASCII.
+Người chơi có thể:
+Tự điều khiển nhân vật.
+Hoặc yêu cầu máy tìm đường.
+Chương trình hiển thị kết quả và so sánh thuật toán.
